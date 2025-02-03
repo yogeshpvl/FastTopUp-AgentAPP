@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import Home from './pages/Home'; // Ensure the path to Home is correct
+import Home from './pages/Home'; 
 import SignIn from './pages/SignIn';
 import BottomTab from './pages/BottomTab';
 import TagIssuance from './pages/TagIssuance';
@@ -20,13 +20,13 @@ const Navigation = () => {
       <Stack.Navigator 
         initialRouteName="SignIn"
         screenOptions={{
-          headerShown: false, // Hide default headers (optional)
+          headerShown: false, 
         }}
       >
         <Stack.Screen 
           name="Home" 
           component={Home} 
-          options={{ title: 'Welcome' }} // Optional title customization
+          options={{ title: 'Welcome' }} 
         />
 
 <Stack.Screen 

@@ -1,9 +1,36 @@
-import React from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import useAuth from '../hooks/useAuth';
+import { Production_URL } from '../apiservice/api';
+import axios from 'axios';
 
 
 const Home = ({navigation}) => {
+
+  const { user, token } = useAuth();
+  console.log("User:", user);
+  console.log("Token:", token);
+  const [banners, setBanners] = React.useState([]);
+
+
+
+  useEffect(() => {
+    fetchBanners();
+  }, []);
+
+  const fetchBanners = async () => {
+    try {
+      const response = await axios.get(Production_URL+"/banner/getallbanner");
+      console.log("Response--", response.data)
+      setBanners(response.data.data);
+    } catch (error) {
+      console.error("Error fetching banners:", error);
+    }
+  };
+
+
   return (
     <View style={styles.container}>
       {/* Header Section */}
@@ -11,12 +38,13 @@ const Home = ({navigation}) => {
   
       <View style={styles.header}>
         <Image
-          source={{ uri: 'https://via.placeholder.com/150' }} // Replace with actual image URL
+          source={{ uri: 'https://via.placeholder.com/150' }} 
           style={styles.headerImage}
         />
         <View style={styles.userInfo}>
-          <Text style={styles.userName}>Shivukumar</Text>
-          <Text style={styles.userID}>ID 1611533</Text>
+          <Text style={styles.userName}>{user?.name}</Text>
+          
+          <Text style={styles.userID}>{user?.id.slice(15)}</Text>
         </View>
         <View style={styles.balanceContainer}>
           {/* <Text style={styles.balanceText}>Balance(₹)</Text>
@@ -24,7 +52,7 @@ const Home = ({navigation}) => {
         </View>
       </View>
       <View>
-        <Image source={{uri:"https://img.freepik.com/free-photo/portrait-curious-happy-pleased-attractive-redhead-woman-yellow-coat-pointing-looking-l_1258-140032.jpg?ga=GA1.1.83890134.1732125402&semt=ais_hybrid"}} style={{width:"90%",height:150,justifyContent:"center",alignContent:"center",alignSelf:"center",marginTop:10,borderRadius:10}}/>
+        <Image source={{uri:""}} style={{width:"90%",height:150,justifyContent:"center",alignContent:"center",alignSelf:"center",marginTop:10,borderRadius:10}}/>
       </View>
       {/* Available Inventory Button */}
       {/* <TouchableOpacity style={styles.inventoryButton}>

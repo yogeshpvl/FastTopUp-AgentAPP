@@ -1,27 +1,83 @@
-import React from 'react';
+import axios from 'axios';
+import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 
 const TagRecharge = () => {
+  const [formData, setFormData] = useState({
+    fromEntityId: 'LQFLEET11501',
+    toEntityId: 'M2PPTEST',
+    productId: 'GENERAL',
+    description: 'transferfunds',
+    amount: '',
+    transactionType: 'M2C',
+    business: 'LQFLEET',
+    businessEntityId: 'LQFLEET',
+    transactionOrigin: 'MOBILE',
+    externalTransactionId: 'LKGP_49f775_0889',
+    yapcode: '1234'
+  });
+
+  const handleChange = (name, value) => {
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const postRequest = async () => {
+    const data = {
+      fromEntityId: formData.fromEntityId,
+      toEntityId: formData.toEntityId,
+      productId: formData.productId,
+      description: formData.description,
+      amount: parseFloat(formData.amount),
+      transactionType: formData.transactionType,
+      business: formData.business,
+      businessEntityId: formData.businessEntityId,
+      transactionOrigin: formData.transactionOrigin,
+      externalTransactionId: formData.externalTransactionId,
+      yapcode: formData.yapcode
+    };
+    
+    const headers = {
+      'Content-Type': 'application/json',
+      'TENANT': 'M2P'
+    };
+
+    try {
+      const response = await axios.post('YOUR_API_ENDPOINT', data, { headers });
+      console.log('Response:', response.data);
+      if (response.data.status === 'SUCCESS') {
+        alert("Recharge Successful");
+      } else {
+        alert('Recharge Failed. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error:', error.response ? error.response.data : error.message);
+    }
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      
-      
       {/* Tag Recharge Form */}
       <View style={styles.formContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter Tag ID"
-          placeholderTextColor="#888"
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Enter Recharge Amount"
-          placeholderTextColor="#888"
-          keyboardType="numeric"
-        />
-        
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Tag ID</Text>
+          <TextInput
+            style={styles.input}
+            value={formData.toEntityId}
+            onChangeText={value => handleChange('toEntityId', value)}
+          />
+        </View>
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Recharge Amount</Text>
+          <TextInput
+            style={styles.input}
+            keyboardType="numeric"
+            value={formData.amount}
+            onChangeText={value => handleChange('amount', value)}
+          />
+        </View>
+
         {/* Submit Button */}
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={postRequest}>
           <Text style={styles.buttonText}>Recharge Tag</Text>
         </TouchableOpacity>
       </View>
@@ -33,15 +89,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f9f9f9',
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#333',
-    textAlign: 'center',
-    fontFamily: 'Poppins-Regular', // Poppins Font
-    marginBottom: 20,
+
   },
   formContainer: {
     backgroundColor: '#fff',
@@ -49,14 +97,20 @@ const styles = StyleSheet.create({
     padding: 15,
     elevation: 5,
   },
+  inputContainer: {
+    marginBottom: 15,
+  },
+  label: {
+    fontSize: 14,
+    fontFamily:"Poppins-regular",
+    marginBottom: 5,
+  },
   input: {
     backgroundColor: '#f5f5f5',
     borderRadius: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 15,
-    marginVertical: 10,
+    paddingVertical: 5,
+    paddingHorizontal: 5,
     fontSize: 16,
-    fontFamily: 'Poppins-Regular', // Poppins Font
   },
   button: {
     backgroundColor: '#8B0000',
@@ -69,7 +123,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
-    fontFamily: 'Poppins-Regular', // Poppins Font
   },
 });
 

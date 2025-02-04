@@ -8,9 +8,6 @@ import {
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const { width } = Dimensions.get('window');
-const TAB_WIDTH = width / 2; // Adjust for the number of tabs
-
 const CustomTabBar = ({ state, descriptors, navigation }) => {
   return (
     <View style={styles.container}>
@@ -31,15 +28,35 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
               );
               label = 'Home';
               break;
-            case 'Settings':
+            case 'Profile':
               iconComponent = (
                 <MaterialCommunityIcons
-                  name="cogs" // Changed icon name to 'cogs' for settings
+                  name="account"
                   size={25}
                   color={isFocused ? 'darkred' : '#757575'}
                 />
               );
-              label = 'Settings';
+              label = 'Profile';
+              break;
+            case 'Tag Replace':
+              iconComponent = (
+                <MaterialCommunityIcons
+                  name="tag"
+                  size={25}
+                  color={isFocused ? 'darkred' : '#757575'}
+                />
+              );
+              label = 'Tag Replace';
+              break;
+            case 'Tags':
+              iconComponent = (
+                <MaterialCommunityIcons
+                  name="tags"
+                  size={25}
+                  color={isFocused ? 'darkred' : '#757575'}
+                />
+              );
+              label = 'Tags';
               break;
             default:
               iconComponent = (

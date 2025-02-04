@@ -1,0 +1,97 @@
+{
+    "dateInfo": [
+        {
+            "date": "1998-05-31",
+            "dateType": "DOB"
+        }
+    ],
+    "communicationInfo": [
+        {
+            "emailId": "goutham@m2p.in",
+            "notification": true,
+            "contactNo": "+919566699940"
+        }
+    ],
+    "addressInfo": [
+        {
+            "pincode": 600091,
+            "country": "India",
+            "state": "Tamil Nadu",
+            "city": "Chennai",
+            "address3": "",
+            "address2": "Paravathi Flats, Puzhitivakkam",
+            "address1": "21/A Kalaimagal Street",
+            "addressCategory": "PERMANENT"
+        }
+    ],
+    "kycInfo": [
+        {
+            "documentNo": "YTRDF5665L",
+            "documentType": "PAN",
+            "kycRefNo": "3456"
+        }
+    ],
+    "kitInfo": [
+        {
+            "cardType": "VIRTUAL",
+            "cardCategory": "PREPAID",
+            "cardRegStatus": "ACTIVE",
+            "aliasName": "Santhosh S"
+        }
+    ],
+    "kycDocuments": [
+        {
+            "documentType": "",
+            "documentFileName": ""
+        }
+    ],
+    "customerStatus": "Individual",
+    "countryCode": "91",
+    "channelName": "MIN_KYC",
+    "kycStatus": "MIN_KYC",
+    "fatcaDecl": "12",
+    "consent": "Y",
+    "politicallyExposed": "N",
+    "entityType": "CUSTOMER",
+    "businessType": "LQFLEET115",
+    "business": "LQFLEET115",
+    "businessId": "M2PPTEST",
+    "specialDate": "",
+    "branch": "LQFLEET1103",
+    "corporate": "LQFLEET115",
+    "entityId": "M2PPTEST",
+    "countryofIssue": "IND",
+    "dependent": false,
+    "fleetAddField": {
+        "applicationDate": "",
+        "applicationNumber": ""
+    },
+    "otp": "850282",
+    "contactNo": "+919566699940",
+    "city": "Chennai",
+    "state": "Tamil Nadu",
+    "pincode": 600091,
+    "address2": "Paravathi Flats, Puzhitivakkam",
+    "address": "21/A Kalaimagal Street",
+    "dap": "",
+    "idNumber": "YTRDF5665L",
+    "proofType": "PAN",
+    "dob": "",
+    "gender": "M",
+    "lastName": "R",
+    "firstName": "santhosh",
+    "emailAddress": "goutham@m2p.in",
+    "country": "India",
+    "reqBranch": "",
+    "preference": {
+        "address": [
+            {
+                "country": "India",
+                "city": "Chennai",
+                "address2": "Paravathi Flats, Puzhitivakkam",
+                "address1": "21/A Kalaimagal Street"
+            }
+        ]
+    },
+    "title": "M/s"
+}

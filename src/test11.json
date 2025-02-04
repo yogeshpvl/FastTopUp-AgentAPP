@@ -1,0 +1,51 @@
+{
+    "idExpiry": "2021-01-28",
+    "pincode": 123455,
+    "country": "In",
+    "state": "dfs",
+    "city": "fds",
+    "address2": null,
+    "address": "dfsf",
+    "emailAddress": "avfg@gmail.com",
+    "contactNo": "+919566699940",
+    "lastName": "PANKAJ JAYANT",
+    "specialDate": "2022-10-28",
+    "dependant": true,
+    "gender": "M",
+    "programType": "LQFLEET115_VC",
+    "kycStatus": "MIN_KYC",
+    "business": "LQFLEET115_VC",
+    "parentEntityId": "M2PPTEST",
+    "fleetAddField": {
+        "entityId": "KL2CBC4201",
+        "customerType": "Individual Customer",
+        "registrationDate": "2024-11-21",
+        "isCommercial": "false"
+    },
+    "businessType": "LQFLEET115_VC",
+    "businessId": "KL2CBC4201",
+    "documents": [
+        {
+            "docExpDate": "2021-01-27",
+            "docType": "RC_NUMBER"
+        }
+    ],
+    "countryofIssue": "IND",
+    "idType": null,
+    "idNumber": "KL2CBC4201",
+    "entityType": "TRUCK_CORPORATE",
+    "color": "#609",
+    "kitNo": "654001-200-0000060",
+    "profileId": "VC4",
+    "tagId": "VC4",
+    "entityId": "KL2CBC4201",
+    "comVehicle": "T",
+    "engineNo": "K14MP1346185",
+    "vin": "78578544",
+    "vrn": "KL2CBC4201",
+    "stateCode": "In",
+    "nationalPermit": "T",
+    "registeredVehicle": "F",
+    "vehicleDescriptor": "PETROL",
+    "nationalPermitDate": "12-01-2025"
+}

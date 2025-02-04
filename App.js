@@ -1,11 +1,14 @@
 
-import React from 'react'
+import React from 'react';
 import Navigation from './src/Navigation'
+import { AuthProvider } from './src/hooks/useAuth';
 
-export default function App() {
+const App = () => {
   return (
-   
+    <AuthProvider>
       <Navigation />
- 
-  )
-}
+    </AuthProvider>
+  );
+};
+
+export default App;

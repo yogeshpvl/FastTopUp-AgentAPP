@@ -1,20 +1,34 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import useAuth from '../hooks/useAuth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Settings = ({ navigation }) => {
+    const {user, token} = useAuth();
+
+    const logout=async()=>{
+      try {
+        await AsyncStorage.removeItem('authToken');
+        await AsyncStorage.removeItem('userData');
+        navigation.navigate('SignIn');
+      } catch (e) {
+        console.log(e);
+      }
+    }
+   
   return (
     <View style={styles.container}>
       {/* Header Section */}
       <View style={styles.header}>
         <Image
-          source={{ uri: 'https://via.placeholder.com/80' }} // Replace with user photo URL
+          source={require('../assets/whiteP.png')} // Replace with user photo URL
           style={styles.userImage}
         />
         <View style={styles.userInfo}>
-          <Text style={styles.userName}>ShriRaam NIKAM</Text>
-          <Text style={styles.userID}>ID: 1611533</Text>
-          <Text style={styles.lastLogin}>Last Login: 2024-06-07 10:30 AM</Text>
+          <Text style={styles.userName}>{user.name}</Text>
+          <Text style={styles.userID}>ID:{user?.id.slice(15)}</Text>
+          <Text style={styles.lastLogin}>{user.email}</Text>
         </View>
       </View>
 
@@ -25,7 +39,7 @@ const Settings = ({ navigation }) => {
         <OptionItem icon="chart-bar" text="Sales Report" onPress={() => navigation.navigate('Report')} />
         <OptionItem icon="credit-card-remove-outline" text="Tag Replacement" onPress={() => navigation.navigate('TagReplacement')} />
         <OptionItem icon="help-circle-outline" text="FAQ" onPress={() => navigation.navigate('FAQ')} />
-        <OptionItem icon="logout" text="Logout" color="#8B0000" onPress={() => navigation.navigate('SignIn')} />
+        <OptionItem icon="logout" text="Logout" color="#8B0000" onPress={logout} />
       </ScrollView>
     </View>
   );
@@ -57,9 +71,9 @@ const styles = StyleSheet.create({
   userImage: {
     width: 80,
     height: 80,
-    borderRadius: 40,
-    borderWidth: 2,
-    borderColor: '#fff',
+    // borderRadius: 40,
+    // borderWidth: 2,
+    // borderColor: '#fff',
   },
   userInfo: {
     marginLeft: 15,

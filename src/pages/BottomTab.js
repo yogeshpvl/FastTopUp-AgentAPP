@@ -18,10 +18,7 @@ function BottomTab({navigation}) {
       initialRouteName="Home"
       tabBar={props => <CustomTabBar {...props} />}>
       <Tab.Screen name="Home" component={Home} options={{headerShown: false}} />
-      <Tab.Screen name="Tags" component={TagList} options={{headerShown: false}} />
-
-      <Tab.Screen name="Tag Replace" component={TagReplacement} options={{headerShown: false}} />
-      
+     
       <Tab.Screen
         name="Profile"
         component={Settings}

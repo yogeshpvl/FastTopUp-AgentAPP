@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Production_URL } from '../apiservice/api';
+import useAuth from '../hooks/useAuth';
 
 const SignIn = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const {user}=useAuth()
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -30,7 +32,7 @@ const SignIn = ({ navigation }) => {
       if (response.ok) {
         await AsyncStorage.setItem("authToken", data.token);
         await AsyncStorage.setItem("userData", JSON.stringify(data.data)); // Store user data
-        Alert.alert("Success", "Logged in successfully");
+        // Alert.alert("Success", "Logged in successfully");
         
         
         navigation.navigate("BottomTab");

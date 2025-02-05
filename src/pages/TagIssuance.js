@@ -2,7 +2,11 @@ import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
 
+
+
 const TagIssuance = () => {
+
+
   const [otpSent, setOtpSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({

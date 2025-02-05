@@ -40,7 +40,7 @@ const Bannercoursoul = () => {
           data={banners}
           scrollAnimationDuration={1000}
           renderItem={({ item }) => (
-            <View style={{ justifyContent: 'center', alignItems: 'center',marginTop:10 }}>
+            <View style={{ justifyContent: 'center', alignItems: 'center',marginTop:20 }}>
               <Image 
                 source={{ uri: `${Production_IMG_URL}/userbanner/${item.banner}` }} 
                 style={{ width: '90%', height: 150, borderRadius: 10 }} 

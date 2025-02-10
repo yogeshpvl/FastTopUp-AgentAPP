@@ -1,10 +1,12 @@
 
 
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image, Alert } from 'react-native';
 import StepIndicator from 'react-native-step-indicator';
 import { Button } from 'react-native-paper';
 import DocumentPicker from 'react-native-document-picker'; // Add the library for file picking
+import axios from 'axios';
+import config from '../apiservice/config';
 
 const Stepper = () => {
   const [formData, setFormData] = useState({
@@ -67,14 +69,341 @@ const Stepper = () => {
     if (currentStep > 0) setCurrentStep(currentStep - 1);
   };
 
-  const handleSendOTP = () => {
-    console.log("Sending OTP to:", formData.contactNo);
+
+
+  const generateOtp = async () => {
+    if (!formData.contactNo || formData.contactNo.length !== 10) {
+      Alert.alert('Error', 'Please enter a valid 10-digit contact number.');
+      return;
+    }
+
+
+    const data = {
+      entityId: 'M2PPTEST',
+      mobileNumber: `+91${formData.contactNo}`,
+      businessType: 'LQFLEET115',
+      entityType: 'CUSTOMER',
+    };
+
+    const headers = {
+      TENANT: process.env.TENANT,
+      partnerId: process.env.PARTNER_ID,
+      partnerToken: process.env.PARTNER_TOKEN,
+      'Content-Type': 'application/json',
+    };
+
+    try {
+      const response = await axios.post(config.SEND_OTP, data, { headers });
+      console.log('Response:', response.data);
+      if (response.data.result.success) {
+   
+        Alert.alert('Success', 'OTP sent successfully!');
+      } else {
+        Alert.alert('Error', 'Failed to send OTP. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error:', error.response ? error.response.data : error.message);
+      Alert.alert('Error', 'An error occurred while sending OTP.');
+    } finally {
+  
+    }
   };
 
-  const handleVerifyOTP = () => {
-    console.log("Verifying OTP:", formData.otp);
+
+  const postRequest = async () => {
+    // Validate OTP
+    if (!formData.otp || formData.otp.toString().length !== 6) {
+      Alert.alert('Error', 'Please enter a valid 6-digit OTP.');
+      return;
+    }
+  
+
+    const data = {
+      dateInfo: [
+        {
+          date: formData.DOB || "1998-05-31", // Ensure this is in "YYYY-MM-DD" format
+          dateType: "DOB",
+        },
+      ],
+      communicationInfo: [
+        {
+          emailId: formData.emailAddress || "default@example.com",
+          notification: true,
+          contactNo: formData.contactNo ? `+91${formData.contactNo}` : "",
+        },
+      ],
+      addressInfo: [
+        {
+          pincode: formData.pincode || 600091,
+          country: formData.country || "India",
+          state: formData.state || "Tamil Nadu",
+          city: formData.city || "Chennai",
+          address3: formData.address3 || "", // Default to empty string if not provided
+          address2: formData.address2 || "Paravathi Flats, Puzhitivakkam",
+          address1: formData.address1 || "21/A Kalaimagal Street",
+          addressCategory: formData.addressCategory || "PERMANENT",
+        },
+      ],
+      kycInfo: [
+        {
+          documentNo: formData.idNumber || "YTRDF5669L",
+          documentType: formData.idType ? formData.idType.toUpperCase() : "PAN",
+          kycRefNo: formData.eKYCRefNo || "34536",
+        },
+      ],
+      kitInfo: [
+        {
+          cardType: "VIRTUAL",
+          cardCategory: "PREPAID",
+          cardRegStatus: "ACTIVE",
+          aliasName: `${formData.firstName || "Yogesh"} ${formData.lastName || "p v"}`,
+        },
+      ],
+      kycDocuments: [
+        {
+          documentType: formData.documentType || "",
+          documentFileName: formData.documentFileName || "",
+        },
+      ],
+      customerStatus: "Individual",
+      countryCode: "91",
+      channelName: "MIN_KYC",
+      kycStatus: "MIN_KYC",
+      fatcaDecl: "12",
+      consent: "Y",
+      politicallyExposed: "N",
+      entityType: "CUSTOMER",
+      businessType: "LQFLEET115",
+      business: "LQFLEET115",
+      businessId: formData.entityId || "",
+      specialDate: "",
+      branch: "LQFLEET1103",
+      corporate: "LQFLEET115",
+      entityId: formData.entityId || "",
+      countryofIssue: "IND",
+      dependent: false,
+      fleetAddField: {
+        applicationDate: "",
+        applicationNumber: "",
+      },
+      otp: formData.otp || "",
+      contactNo: formData.contactNo ? `+91${formData.contactNo}` : "",
+      city: formData.city || "Chennai",
+      state: formData.state || "Tamil Nadu",
+      pincode: formData.pincode || 600091,
+      address2: formData.address2 || "Paravathi Flats, Puzhitivakkam",
+      address: formData.address1 || "21/A Kalaimagal Street",
+      dap: "",
+      idNumber: formData.idNumber || "YTRDF5667L",
+      proofType: formData.idType ? formData.idType.toUpperCase() : "PAN",
+      dob: formData.DOB || "",
+      gender: formData.gender || "M",
+      lastName: formData.lastName || "p v",
+      firstName: formData.firstName || "Yogesh",
+      emailAddress: formData.emailAddress || "yogeshagu@gmail.com",
+      country: formData.country || "India",
+      reqBranch: "",
+      preference: {
+        address: [
+          {
+            country: formData.country || "India",
+            city: formData.city || "Chennai",
+            address2: formData.address2 || "Paravathi Flats, Puzhitivakkam",
+            address1: formData.address1 || "21/A Kalaimagal Street",
+          },
+        ],
+      },
+      title: "M/s",
+    };
+    
+    // Log the final request data for debugging
+    console.log("Final Request Data:", JSON.stringify(data, null, 2));
+    
+    console.log("Request Data:", data);
+  
+    const headers = {
+      TENANT: process.env.TENANT,
+      partnerId: process.env.PARTNER_ID,
+      partnerToken: process.env.PARTNER_TOKEN,
+      'Content-Type': 'application/json',
+    };
+  
+    try {
+      const response = await axios.post(
+        config.CUSTOMER_REGISTER_WITH_OTP, 
+        data, 
+        { headers }
+      );
+      
+      console.log('Response:', response.data);
+    
+      if (response.data.status === 'SUCCESS') {
+        Alert.alert('Success', 'Registration successful!');
+      } else {
+        console.log("API Error:", response.data);
+        Alert.alert('Error', response.data.exception?.shortMessage || 'Failed to register. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error:', error.response ? error.response.data : error.message);
+    
+      // Extract meaningful error message
+      const errorMessage = error.response?.data?.exception?.shortMessage || 
+                           error.response?.data?.detailMessage || 
+                           'An error occurred during registration.';
+    
+      Alert.alert('Error', errorMessage);
+    }
+    
+    
   };
 
+
+  const step2 = async () => {
+    // Validate OTP
+    if (!formData.otp || formData.otp.toString().length !== 6) {
+      Alert.alert('Error', 'Please enter a valid 6-digit OTP.');
+      return;
+    }
+  
+
+    const data = {
+      dateInfo: [
+        {
+          date: formData.DOB || "1998-05-31", // Ensure this is in "YYYY-MM-DD" format
+          dateType: "DOB",
+        },
+      ],
+      communicationInfo: [
+        {
+          emailId: formData.emailAddress || "default@example.com",
+          notification: true,
+          contactNo: formData.contactNo ? `+91${formData.contactNo}` : "",
+        },
+      ],
+      addressInfo: [
+        {
+          pincode: formData.pincode || 600091,
+          country: formData.country || "India",
+          state: formData.state || "Tamil Nadu",
+          city: formData.city || "Chennai",
+          address3: formData.address3 || "", // Default to empty string if not provided
+          address2: formData.address2 || "Paravathi Flats, Puzhitivakkam",
+          address1: formData.address1 || "21/A Kalaimagal Street",
+          addressCategory: formData.addressCategory || "PERMANENT",
+        },
+      ],
+      kycInfo: [
+        {
+          documentNo: formData.idNumber || "YTRDF5669L",
+          documentType: formData.idType ? formData.idType.toUpperCase() : "PAN",
+          kycRefNo: formData.eKYCRefNo || "34536",
+        },
+      ],
+      kitInfo: [
+        {
+          cardType: "VIRTUAL",
+          cardCategory: "PREPAID",
+          cardRegStatus: "ACTIVE",
+          aliasName: `${formData.firstName || "Yogesh"} ${formData.lastName || "p v"}`,
+        },
+      ],
+      kycDocuments: [
+        {
+          documentType: formData.documentType || "",
+          documentFileName: formData.documentFileName || "",
+        },
+      ],
+      customerStatus: "Individual",
+      countryCode: "91",
+      channelName: "MIN_KYC",
+      kycStatus: "MIN_KYC",
+      fatcaDecl: "12",
+      consent: "Y",
+      politicallyExposed: "N",
+      entityType: "CUSTOMER",
+      businessType: "LQFLEET115",
+      business: "LQFLEET115",
+      businessId: formData.entityId || "",
+      specialDate: "",
+      branch: "LQFLEET1103",
+      corporate: "LQFLEET115",
+      entityId: formData.entityId || "",
+      countryofIssue: "IND",
+      dependent: false,
+      fleetAddField: {
+        applicationDate: "",
+        applicationNumber: "",
+      },
+      otp: formData.otp || "",
+      contactNo: formData.contactNo ? `+91${formData.contactNo}` : "",
+      city: formData.city || "Chennai",
+      state: formData.state || "Tamil Nadu",
+      pincode: formData.pincode || 600091,
+      address2: formData.address2 || "Paravathi Flats, Puzhitivakkam",
+      address: formData.address1 || "21/A Kalaimagal Street",
+      dap: "",
+      idNumber: formData.idNumber || "YTRDF5667L",
+      proofType: formData.idType ? formData.idType.toUpperCase() : "PAN",
+      dob: formData.DOB || "",
+      gender: formData.gender || "M",
+      lastName: formData.lastName || "p v",
+      firstName: formData.firstName || "Yogesh",
+      emailAddress: formData.emailAddress || "yogeshagu@gmail.com",
+      country: formData.country || "India",
+      reqBranch: "",
+      preference: {
+        address: [
+          {
+            country: formData.country || "India",
+            city: formData.city || "Chennai",
+            address2: formData.address2 || "Paravathi Flats, Puzhitivakkam",
+            address1: formData.address1 || "21/A Kalaimagal Street",
+          },
+        ],
+      },
+      title: "M/s",
+    };
+    
+    // Log the final request data for debugging
+    console.log("Final Request Data:", JSON.stringify(data, null, 2));
+    
+    console.log("Request Data:", data);
+  
+    const headers = {
+      TENANT: process.env.TENANT,
+      partnerId: process.env.PARTNER_ID,
+      partnerToken: process.env.PARTNER_TOKEN,
+      'Content-Type': 'application/json',
+    };
+  
+    try {
+      const response = await axios.post(
+        config.VAHAN_FIELDS, 
+        data, 
+        { headers }
+      );
+      
+      console.log('Response:', response.data);
+    
+      if (response.data.status === 'SUCCESS') {
+        Alert.alert('Success', 'Registration successful!');
+      } else {
+        console.log("API Error:", response.data);
+        Alert.alert('Error', response.data.exception?.shortMessage || 'Failed to register. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error:', error.response ? error.response.data : error.message);
+    
+      // Extract meaningful error message
+      const errorMessage = error.response?.data?.exception?.shortMessage || 
+                           error.response?.data?.detailMessage || 
+                           'An error occurred during registration.';
+    
+      Alert.alert('Error', errorMessage);
+    }
+    
+    
+  };
   const handleFilePick = async (field) => {
     try {
       const result = await DocumentPicker.pick({
@@ -107,7 +436,9 @@ const Stepper = () => {
           <TextInput
             style={styles.input}
             value={formData.entityId}
-            editable={false}
+            onChangeText={(value) => handleChange('entityId', value)}
+
+            // editable={false}
           />
           <Text style={styles.label}>First Name</Text>
           <TextInput
@@ -122,9 +453,29 @@ const Stepper = () => {
           <Text style={styles.label}>Contact Number</Text>
           <TextInput
             style={styles.input}
-            keyboardType="phone-pad"
+            // keyboardType="phone-pad"
             maxLength={10}
             onChangeText={(value) => handleChange('contactNo', value)}
+          />
+           <TouchableOpacity onPress={generateOtp}>
+              <Text style={styles.otpText}>Resend OTP</Text>
+            </TouchableOpacity>
+            <Text style={styles.label}>OTP</Text>
+
+           
+          <TextInput
+            style={styles.input}
+            keyboardType="phone-pad"
+            maxLength={10}
+            onChangeText={(value) => handleChange('otp', value)}
+          />
+          <Text style={styles.label}>Gender</Text>
+
+             <TextInput
+            style={styles.input}
+            keyboardType="phone-pad"
+            maxLength={10}
+            onChangeText={(value) => handleChange('gender', value)}
           />
           <Text style={styles.label}>Email Address</Text>
           <TextInput
@@ -173,7 +524,7 @@ const Stepper = () => {
           <Text style={styles.label}>Pincode</Text>
           <TextInput
             style={styles.input}
-            keyboardType="numeric"
+            // keyboardType="numeric"
             onChangeText={(value) => handleChange('pincode', value)}
           />
           <Text style={styles.label}>ID Type</Text>
@@ -211,6 +562,9 @@ const Stepper = () => {
             placeholder="YYYY-MM-DD"
             onChangeText={(value) => handleChange('DOB', value)}
           />
+          <TouchableOpacity onPress={postRequest} >
+            <Text style={styles.submitText}>Submit</Text> 
+          </TouchableOpacity>
         </View>
         )}
 
@@ -301,7 +655,7 @@ const indicatorStyles = {
   stepStrokeUnFinishedColor: '#8B0000', // dark red
   separatorFinishedColor: '#FF4500',
   separatorUnFinishedColor: '#8B0000',
-  stepIndicatorFinishedColor: '#FF4500',
+  stepIndicatorFinishedColor: 'green',
   stepIndicatorUnFinishedColor: '#FFFFFF',
   stepIndicatorCurrentColor: '#FFFFFF',
   stepIndicatorLabelFontSize: 12,

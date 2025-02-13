@@ -2,6 +2,7 @@ const config={
     TENANT:"LQFLEET",
 PARTNER_ID:"LQFLEET",
 PARTNER_TOKEN:"Basic TFFGTEVFVA",
+businessType:"LQFLEET115",
 
 
 //customer send OTP
@@ -44,8 +45,11 @@ FETCH_TXN_BY_EXT_TXN_ID:"https://sit-secure.yappay.in/Yappay/txn-manager/fetch/L
 CHANGE_TAG_STATUS:"https://uat-fleetdrive.m2pfintech.com/core/Yappay/fleet-manager/negativeList",
 
 //Tag Replacement
-TAG_REPLACEMENT:"https://uat-fleetdrive.m2pfintech.com/core/Yappay/business-entity-manager/replaceTag"
+TAG_REPLACEMENT:"https://uat-fleetdrive.m2pfintech.com/core/Yappay/business-entity-manager/replaceTag",
 
+
+//customer reg
+CUSTOMER_REG:"customer-reg",
 }
 
 

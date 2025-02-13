@@ -1,5 +1,5 @@
 
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
+  RefreshControl,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -19,16 +20,36 @@ const Home = ({navigation}) => {
   console.log('User:', user);
   console.log('Token:', token);
 
-  useEffect(() => {
-    if (!user) {
-      // Call the authentication function again if user is not available initially
-      // Ensure that useAuth() internally fetches user data when called
-      useAuth();
+useEffect(() => {
+  if (!user) {
+    navigation.replace('Login'); // Redirect to Login if user is not authenticated
+  }
+}, [user, navigation]);
+const [refreshing, setRefreshing] = useState(false);
+
+  // Fetch latest data
+  const fetchData = async () => {
+    setRefreshing(true);
+    try {
+      // Simulate API call or fetch latest user data
+      console.log('Refreshing data...');
+      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulating delay
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setRefreshing(false);
     }
-  }, [user]);
+  };
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+    style={styles.container}
+        contentContainerStyle={styles.cardContainer}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={fetchData} />
+        }>
+
+<View style={styles.container}>
       {/* Header Section */}
       <View style={styles.header}>
         <View style={styles.userInfo}>
@@ -81,6 +102,8 @@ const Home = ({navigation}) => {
         </TouchableOpacity>
       </ScrollView>
     </View>
+        </ScrollView>
+
   );
 };
 

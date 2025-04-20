@@ -338,8 +338,6 @@
 //                // keyboardType="numeric"
 //                onChangeText={(value) => handleChange('pincode', value)}
 //              />
-            
-            
 //              <Text style={styles.label}>Country of Issue</Text>
 //              <TextInput
 //                style={styles.input}

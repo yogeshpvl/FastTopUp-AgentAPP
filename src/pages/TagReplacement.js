@@ -2,8 +2,11 @@ import axios from 'axios';
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import config from '../apiservice/config';
+import { Production_URL } from '../apiservice/api';
 
 const TagReplacement = () => {
+  const [customerNumber, setcustomerNumber] = useState('')
+  const [customerData,  setCustomerData] = useState([])
   const [formData, setFormData] = useState({
     entityId: '',
     oldKitNo: '',
@@ -28,6 +31,20 @@ const TagReplacement = () => {
       return false;
     }
     return true;
+  };
+
+  const fetchCustomer = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(Production_URL + `/customer/entityID?contactNo=${customerNumber}`);
+
+      console.log("response --custr", response.data.customer)
+      setCustomerData(response.data.customer);
+    } catch (error) {
+      console.error('Error fetching banners:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const postRequest = async () => {

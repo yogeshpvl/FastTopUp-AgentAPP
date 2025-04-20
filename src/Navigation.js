@@ -14,6 +14,11 @@ import useAuth from './hooks/useAuth';
 import { ActivityIndicator, Image, View } from 'react-native';
 import TagList from './pages/TagList';
 import Stepper from './pages/Stepper';
+import TagAssign from './pages/TCFLOW/TagAssign';
+import Wallet from './pages/Wallet';
+import CustomerRegistrationotp from './pages/TCFLOW/Customer-Registration_otp';
+import UploadKyc from './pages/TCFLOW/Upload-Kyc';
+import VehicleRegistration from './pages/TCFLOW/Vehicle-Registration';
 
 // Create Stack Navigator
 const Stack = createStackNavigator();
@@ -50,6 +55,17 @@ const Navigation = () => {
         <Stack.Screen name="FAQ" component={FAQ} options={{ headerShown: true, headerTitle: "FAQ" }} />
         <Stack.Screen name="Report" component={SaleReport} options={{ headerShown: true, headerTitle: "Sale Report" }} />
         <Stack.Screen name="Challan" component={Challan} options={{ headerShown: true, headerTitle: "Challan" }} />
+
+        <Stack.Screen name="wallet" component={Wallet} options={{ headerShown: true, headerTitle: "Wallet" }} />
+
+        <Stack.Screen name="TagAssign" component={TagAssign} options={{ headerShown: true, headerTitle: "Tag Assign" }} />
+        <Stack.Screen name="CustomerRegistration" component={CustomerRegistrationotp} options={{ headerShown: true, headerTitle: "Customer Registration With OTP" }} />
+        <Stack.Screen name="UploadKyc" component={UploadKyc} options={{ headerShown: true, headerTitle: "Upload kyc" }} />
+        <Stack.Screen name="vehiclereg" component={VehicleRegistration} options={{ headerShown: true, headerTitle: "Vehicle Registration" }} />
+
+
+
+
       </Stack.Navigator>
     </NavigationContainer>
   );

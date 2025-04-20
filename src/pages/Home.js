@@ -17,8 +17,7 @@ import Bannercoursoul from './Bannercoursoul';
 
 const Home = ({navigation}) => {
   const {user, token} = useAuth();
-  console.log('User:', user);
-  console.log('Token:', token);
+
 
 useEffect(() => {
   if (!user) {
@@ -56,10 +55,10 @@ const [refreshing, setRefreshing] = useState(false);
           <Text style={styles.userName}>{user?.name}</Text>
           <Text style={styles.userID}>{user?.id.slice(15)}</Text>
         </View>
-        <View style={styles.balanceContainer}>
+        <TouchableOpacity style={styles.balanceContainer} onPress={()=>navigation.navigate("wallet")}>
         <AntDesign name="wallet" size={30} color="#fff" />
          
-        </View>
+        </TouchableOpacity>
       </View>
 
       {/* Banner Section */}
@@ -75,16 +74,16 @@ const [refreshing, setRefreshing] = useState(false);
       <ScrollView contentContainerStyle={styles.cardContainer}>
         <TouchableOpacity
           style={styles.card}
-          onPress={() => navigation.navigate('Stepper')}>
+          onPress={() => navigation.navigate('TagAssign')}>
           <Icon name="credit-card-plus-outline" size={30} color="#fff" />
           <Text style={styles.cardText}>TAG ISSUANCE</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.card}
-          onPress={() => navigation.navigate('TagRecharge')}>
+          onPress={() => navigation.navigate('UploadKyc')}>
           <Icon name="credit-card-refresh-outline" size={30} color="#fff" />
-          <Text style={styles.cardText}>WALLET RECHARGE</Text>
+          <Text style={styles.cardText}>Upload kyc</Text>
         </TouchableOpacity>
 
         <TouchableOpacity

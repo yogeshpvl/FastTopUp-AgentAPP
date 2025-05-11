@@ -1,95 +1,79 @@
 import React from 'react';
-import {
-  View,
-  TouchableOpacity,
-  StyleSheet,
-  Dimensions,
-  Text,
-} from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 
 const CustomTabBar = ({ state, descriptors, navigation }) => {
+  const handlePress = (route, index) => {
+    const isFocused = state.index === index;
+    const event = navigation.emit({
+      type: 'tabPress',
+      target: route.key,
+      canPreventDefault: true,
+    });
+
+    if (!isFocused && !event.defaultPrevented) {
+      navigation.navigate(route.name);
+      ReactNativeHapticFeedback.trigger('impactLight');
+    }
+  };
+
+  // Debug: Log routes and focus state
+  console.log('Routes:', state.routes.map((route, index) => ({
+    name: route.name,
+    isFocused: state.index === index,
+  })));
+
   return (
     <View style={styles.container}>
       <View style={styles.tabBar}>
         {state.routes.map((route, index) => {
           const isFocused = state.index === index;
-          let iconComponent;
+          let iconName;
           let label;
 
           switch (route.name) {
             case 'Home':
-              iconComponent = (
-                <MaterialCommunityIcons
-                  name="home"
-                  size={25}
-                  color={isFocused ? 'darkred' : '#757575'}
-                />
-              );
+              iconName = 'home';
               label = 'Home';
               break;
-            case 'Profile':
-              iconComponent = (
-                <MaterialCommunityIcons
-                  name="account"
-                  size={25}
-                  color={isFocused ? 'darkred' : '#757575'}
-                />
-              );
-              label = 'Profile';
-              break;
-            case 'Tag Replace':
-              iconComponent = (
-                <MaterialCommunityIcons
-                  name="tag"
-                  size={25}
-                  color={isFocused ? 'darkred' : '#757575'}
-                />
-              );
-              label = 'Tag Replace';
+            case 'Replace Tag':
+              iconName = 'tag-arrow-right';
+              label = 'Replace';
               break;
             case 'Tags':
-              iconComponent = (
-                <MaterialCommunityIcons
-                  name="tags"
-                  size={25}
-                  color={isFocused ? 'darkred' : '#757575'}
-                />
-              );
+              iconName = 'tag-multiple';
               label = 'Tags';
               break;
+            case 'Profile':
+              iconName = 'account-circle';
+              label = 'Profile';
+              break;
             default:
-              iconComponent = (
-                <MaterialCommunityIcons
-                  name="settings"
-                  size={25}
-                  color={isFocused ? 'darkred' : '#757575'}
-                />
-              );
+              iconName = 'help-circle';
               label = route.name;
               break;
           }
 
-          const handlePress = () => {
-            const event = navigation.emit({
-              type: 'tabPress',
-              target: route.key,
-              canPreventDefault: true,
-            });
-
-            if (!isFocused && !event.defaultPrevented) {
-              navigation.navigate(route.name);
-            }
-          };
-
           return (
             <TouchableOpacity
               key={route.key}
-              onPress={handlePress}
-              style={styles.tab}>
-              <View style={styles.iconAndText}>
-                {iconComponent}
-                <Text style={[styles.label, isFocused && styles.labelFocused]}>
+              onPress={() => handlePress(route, index)}
+              style={[styles.tab, isFocused ? styles.tabFocused : styles.tabInactive]}
+              activeOpacity={0.8}
+            >
+              <View style={styles.iconContainer}>
+                <MaterialCommunityIcons
+                  name={iconName}
+                  size={isFocused ? 30 : 24}
+                  color={isFocused ? '#8B0000' : '#333333'}
+                />
+                <Text
+                  style={[
+                    styles.label,
+                    isFocused ? styles.labelFocused : styles.labelInactive,
+                  ]}
+                >
                   {label}
                 </Text>
               </View>
@@ -103,36 +87,58 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'white',
-    height: 60,
+    paddingBottom: 10,
     elevation: 10,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    backgroundColor: '#FFFFFF',
   },
   tabBar: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#FFFFFF',
     height: 60,
-    borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
+    paddingHorizontal: 10,
+    zIndex: 1,
   },
   tab: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    borderRadius: 12,
+    paddingVertical: 5,
+    borderWidth: 1,
+    borderColor: 'transparent',
+    // Debug: Temporary border to verify rendering
+    // borderColor: 'blue',
   },
-  iconAndText: {
+  tabFocused: {
+    backgroundColor: 'rgba(139, 0, 0, 0.3)', // Red tint for active tab
+    borderColor: '#8B0000',
+  },
+  tabInactive: {
+    // backgroundColor: 'rgba(0, 0, 0, 0.2)', // Gray tint for inactive tabs
+    // borderColor: 'rgba(0, 0, 0, 0.3)',
+  },
+  iconContainer: {
     alignItems: 'center',
+    opacity: 1,
+    // Debug: Temporary border to verify rendering
+    // borderWidth: 1,
+    // borderColor: 'green',
   },
   label: {
     fontSize: 12,
-    color: '#757575',
     marginTop: 4,
-    fontFamily: 'Poppins-Medium',
+    fontFamily: 'Poppins-Regular',
   },
   labelFocused: {
-    color: 'darkred',
-    fontWeight: 'bold',
+    color: '#8B0000',
+    fontFamily: 'Poppins-Bold',
+  },
+  labelInactive: {
+    color: '#333333',
   },
 });
 

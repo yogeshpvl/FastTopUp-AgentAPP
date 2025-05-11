@@ -1,15 +1,65 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, FlatList } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, ScrollView, ActivityIndicator, ToastAndroid } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { Button } from 'react-native-paper';
+import RNFS from 'react-native-fs'; // for download CSV
+import { Production_URL } from '../apiservice/api';
+import useAuth from '../hooks/useAuth';
+import moment from 'moment';
 
 const SaleReport = () => {
-  // Sample sales data for the report
-  const salesData = [
-    { id: '1', date: '2024-12-01', amount: '₹ 5000', status: 'Completed' },
-    { id: '2', date: '2024-12-02', amount: '₹ 3000', status: 'Pending' },
-    { id: '3', date: '2024-12-03', amount: '₹ 4500', status: 'Completed' },
-    { id: '4', date: '2024-12-04', amount: '₹ 6000', status: 'Completed' },
-    { id: '5', date: '2024-12-05', amount: '₹ 2500', status: 'Pending' },
-  ];
+  const { user } = useAuth();
+  const [fromDate, setFromDate] = useState(new Date());
+  const [toDate, setToDate] = useState(new Date());
+  const [showFromPicker, setShowFromPicker] = useState(false);
+  const [showToPicker, setShowToPicker] = useState(false);
+  const [reportData, setReportData] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const formatDate = (date) => {
+    return date.toISOString().split('T')[0];
+  };
+
+  const fetchReport = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `${Production_URL}/customer/AgentReport?agentId=${user.id}&fromDate=${formatDate(fromDate)}&toDate=${formatDate(toDate)}`
+      );
+      const data = await response.json();
+      console.log("data---",data)
+      if (data.success) {
+        setReportData(data.data);
+      } else {
+        ToastAndroid.show('Failed to fetch report', ToastAndroid.SHORT);
+      }
+    } catch (error) {
+      console.error(error);
+      ToastAndroid.show('Error fetching report', ToastAndroid.SHORT);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const downloadCSV = async () => {
+    if (!reportData || !reportData.customers) return;
+
+    const csvHeader = 'Contact No,Kit No,Tag Class,Status,Created At\n';
+    const csvRows = reportData.customers.map(c => 
+      `${c.contactNo},${c.kitNo},${c.tagClass},${c.status},${formatDate(new Date(c.createdAt))}`
+    ).join('\n');
+
+    const csvString = csvHeader + csvRows;
+    const path = RNFS.DownloadDirectoryPath + '/AgentReport.csv';
+
+    try {
+      await RNFS.writeFile(path, csvString, 'utf8');
+      ToastAndroid.show('Report Downloaded Successfully', ToastAndroid.SHORT);
+    } catch (error) {
+      console.error(error);
+      ToastAndroid.show('Failed to download report', ToastAndroid.SHORT);
+    }
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -17,38 +67,80 @@ const SaleReport = () => {
 
       {/* Date Filter Section */}
       <View style={styles.filterContainer}>
-        <Text style={styles.filterText}>Filter by Date:</Text>
-        <TouchableOpacity style={styles.dateFilterButton}>
-          <Text style={styles.filterButtonText}>Select Date</Text>
+        <TouchableOpacity onPress={() => setShowFromPicker(true)} style={styles.dateFilterButton}>
+          <Text style={styles.filterButtonText}>From: {formatDate(fromDate)}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => setShowToPicker(true)} style={styles.dateFilterButton}>
+          <Text style={styles.filterButtonText}>To: {formatDate(toDate)}</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Sales Data List */}
-      <FlatList
-        data={salesData}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.reportItem}>
-            <Text style={styles.reportText}>Date: {item.date}</Text>
-            <Text style={styles.reportText}>Amount: {item.amount}</Text>
-            <Text style={styles.reportText}>Status: {item.status}</Text>
-          </View>
-        )}
-      />
+      {showFromPicker && (
+        <DateTimePicker
+          value={fromDate}
+          mode="date"
+          display="default"
+          onChange={(event, selectedDate) => {
+            setShowFromPicker(false);
+            if (selectedDate) setFromDate(selectedDate);
+          }}
+        />
+      )}
 
-      {/* View Detailed Report Button */}
-      <TouchableOpacity style={styles.viewButton}>
-        <Text style={styles.viewButtonText}>View Detailed Report</Text>
-      </TouchableOpacity>
+      {showToPicker && (
+        <DateTimePicker
+          value={toDate}
+          mode="date"
+          display="default"
+          onChange={(event, selectedDate) => {
+            setShowToPicker(false);
+            if (selectedDate) setToDate(selectedDate);
+          }}
+        />
+      )}
+
+      <Button mode="contained" onPress={fetchReport} style={{ marginVertical: 15 }}>
+        Fetch Report
+      </Button>
+
+      {loading && <ActivityIndicator size="large" color="darkred" />}
+
+      {reportData && (
+        <>
+          <View style={styles.summaryCard}>
+            <Text style={styles.reportText}>MinKYC Customers: {reportData.minKYCCount}</Text>
+            <Text style={styles.reportText}>FullKYC Customers: {reportData.fullKYCCount}</Text>
+          </View>
+
+          <Button mode="contained" onPress={downloadCSV} style={{ marginVertical: 15 }}>
+            Download Report (CSV)
+          </Button>
+          <FlatList
+            data={reportData.customers}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => (
+              <View style={styles.reportItem}>
+                <Text style={styles.reportText}>Contact: {item.contactNo}</Text>
+                <Text style={styles.reportText}>Kit No: {item.kitNo}</Text>
+                <Text style={styles.reportText}>Tag Class: {item.tagClass}</Text>
+                <Text style={styles.reportText}>Status: {item.status}</Text>
+                <Text style={styles.reportText}>Date: {moment(item.createdAt).format("MM-DD-YYYY LT")}</Text>
+              </View>
+            )}
+          />
+
+
+        </>
+      )}
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#f9f9f9',
     padding: 20,
+    backgroundColor: '#f9f9f9',
   },
   title: {
     fontSize: 24,
@@ -56,18 +148,11 @@ const styles = StyleSheet.create({
     color: '#333',
     textAlign: 'center',
     marginBottom: 20,
-    fontFamily: 'Poppins-Regular',
   },
   filterContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
     marginBottom: 15,
-  },
-  filterText: {
-    fontSize: 16,
-    color: '#333',
-    fontFamily: 'Poppins-Regular',
   },
   dateFilterButton: {
     backgroundColor: '#8B0000',
@@ -78,33 +163,25 @@ const styles = StyleSheet.create({
   filterButtonText: {
     color: '#fff',
     fontSize: 14,
-    fontFamily: 'Poppins-Regular',
+  },
+  summaryCard: {
+    backgroundColor: '#fff',
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 10,
+    elevation: 5,
   },
   reportItem: {
     backgroundColor: '#fff',
-    borderRadius: 10,
     padding: 15,
+    borderRadius: 10,
     marginBottom: 10,
     elevation: 5,
   },
   reportText: {
     fontSize: 14,
     color: '#333',
-    marginBottom: 8,
-    fontFamily: 'Poppins-Regular',
-  },
-  viewButton: {
-    backgroundColor: '#8B0000',
-    paddingVertical: 15,
-    borderRadius: 10,
-    marginTop: 20,
-    alignItems: 'center',
-  },
-  viewButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-    fontFamily: 'Poppins-Regular',
+    marginBottom: 5,
   },
 });
 

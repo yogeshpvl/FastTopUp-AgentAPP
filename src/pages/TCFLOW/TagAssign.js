@@ -38,7 +38,7 @@ const [loader, setloader]=useState(false)
     setloader(true)
     try {
       const res = await axios.post(
-        'http://192.168.11.102:8500/api/customer/register',
+        'https://api.aktollpark.com/api/customer/register',
         {
           carNumber: carNumber,
           customerNumber: mobileNumber,
@@ -52,14 +52,21 @@ const [loader, setloader]=useState(false)
       await AsyncStorage.setItem("pandetails", JSON.stringify(res.data.panAddress));
       await AsyncStorage.setItem("customer", JSON.stringify(res.data.customer));
 
+if(data.status === "CUSTOMER REGISTERED"){
+  navigation.navigate("vehiclereg");
 
-      navigation.navigate("CustomerRegistration");
-      // You can navigate to another screen with this data or show a success popup
+}else{
+  navigation.navigate("CustomerRegistration");
+
+}
+      
       Alert.alert('Success', 'Data Fetched Successfully!');
     
 
     } catch (err) {
       console.error('API error:', err);
+  navigation.navigate("CustomerRegistration");
+
       Alert.alert('Error', 'Failed to fetch vehicle info.');
     }finally{
       setloader(false)

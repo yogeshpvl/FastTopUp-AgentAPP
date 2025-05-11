@@ -7,21 +7,35 @@ import {
   StyleSheet,
   Alert,
   ScrollView,
+  Modal
 } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { Production_URL } from '../../apiservice/api';
+import useAuth from '../../hooks/useAuth';
+import FastTagPaymentModal from './FastTagPaymentModal';
+import { Picker } from '@react-native-picker/picker';
 export default function VehicleRegistration({ navigation }) {
+   const {user} = useAuth();
+   const [subData, setSubData] = useState([]);
+   const [visible, setVisible] = useState(false);
+   const [Balance,  setBalance] = useState()
+   
+
+   console.log("subData0-----",subData)
+
+   console.log("userrr",user)
   const [loading, setLoading] = useState(false);
+  const [amount, setAmount] = useState('');
   const [formData, setFormData] = useState({
-    idExpiry: '',
-    pincode: '',
+    idExpiry: '2021-01-28',
+    pincode: '123455',
     country: 'In',
     state: '',
     city: '',
-    address2: '',
+    address2: null,
     address: '',
-    emailAddress: '',
+    emailAddress: 'test@example.com',
     contactNo: '',
     lastName: '',
     specialDate: '',
@@ -34,18 +48,18 @@ export default function VehicleRegistration({ navigation }) {
     businessType: '',
     businessId: '',
     countryofIssue: 'IND',
-    idType: '',
+    idType: null,
     idNumber: '',
     entityType: 'TRUCK_CORPORATE',
     color: '#609',
-    kitNo: '6540012000000062',
+    kitNo: '',
     profileId: '',
     tagId: '',
     entityId: '',
     comVehicle: 'T',
     engineNo: 'K14MP1346185',
     vin: '78578544',
-    vrn: 'KL2CBC4201',
+    vrn:'',
     stateCode: 'In',
     nationalPermit: 'T',
     registeredVehicle: 'F',
@@ -64,6 +78,21 @@ export default function VehicleRegistration({ navigation }) {
       },
     ],
   });
+
+     useEffect(() => {
+          fetchWalletDetails();
+      }, []);
+  
+      const fetchWalletDetails = async () => {
+          try {
+              const response = await axios.get(`https://api.aktollpark.com/wallet-details/${user.id}`);
+              setBalance(response.data.balance);
+            
+          } catch (error) {
+              console.error("Error fetching wallet details:", error);
+              Alert.alert("Error", "Failed to load wallet details.");
+          }
+      };
 
   useEffect(() => {
     const getCustomer = async () => {
@@ -88,9 +117,11 @@ export default function VehicleRegistration({ navigation }) {
             lastName: customer?.lastName || '',
             specialDate: customer?.dob || '',
             gender: customer?.gender || '',
-            entityId: customerEntityId,
-            idNumber: customerEntityId,
-            businessId: customerEntityId,
+            parentEntityId: customerEntityId,
+            entityId: customer?.carNumber,
+            idNumber:customer?.carNumber,
+            businessId: customer?.carNumber,
+            vrn:customer?.carNumber,
             programType: 'LQFLEET115_VC',
             kycStatus: 'MIN_KYC',
             business: 'LQFLEET115_VC',
@@ -99,9 +130,9 @@ export default function VehicleRegistration({ navigation }) {
             tagId: 'VC4',
             fleetAddField: {
               ...prev.fleetAddField,
-              entityId: customerEntityId,
+              entityId: customer?.carNumber,
               customerType: 'Individual Customer',
-              registrationDate: new Date().toISOString().split('T')[0], // YYYY-MM-DD
+              registrationDate: new Date().toISOString().split('T')[0], 
               isCommercial: 'false'
             }
           }));
@@ -113,7 +144,21 @@ export default function VehicleRegistration({ navigation }) {
   
     getCustomer();
   }, []);
-  
+  const [KitData, setKitData] = useState([]);
+const [tagClass, setTagClass] = useState('');
+useEffect(() => {
+  if (tagClass) fetchKitNos();
+}, [tagClass]);
+
+const fetchKitNos = async () => {
+  try {
+    const response = await axios.get(`https://api.aktollpark.com/api/tags/agentnotstart/${user.id}?tagClass=${tagClass}`);
+    setKitData(response.data); // Assuming response.data is an array of kits
+  } catch (error) {
+    console.error("Error fetching kit numbers:", error);
+    Alert.alert("Error", "Failed to load kit numbers.");
+  }
+};
   
   
 
@@ -146,12 +191,17 @@ export default function VehicleRegistration({ navigation }) {
     }));
   };
 
+  const handleModal =()=>{
+    setVisible(true)
+  }
+
+  console.log("formData--",formData)
   const postRequest = async () => {
     if (!formData.contactNo || !formData.idNumber || !formData.vrn) {
       Alert.alert('Missing Fields', 'Please fill all required fields');
       return;
     }
-
+console.log("api hitting")
     setLoading(true);
 
     try {
@@ -160,16 +210,22 @@ export default function VehicleRegistration({ navigation }) {
         contactNo: formData.contactNo.replace(/^(\+91|91)/, '+91'),
         fleetAddField: { ...formData.fleetAddField },
         documents: [...formData.documents],
+        amount:subData?.fastTagPrice?.total,
+        agentId:user?.id,
+        type:"Prepaid"
       };
 
       const response = await axios.post(
-        `http://192.168.11.102:8500/api/customer/vehicle-registration`,
+        `https://api.aktollpark.com/api/customer/vehicle-registration`,
         payload
       );
-
+      navigation.navigate("UploadKyc")
       console.log("response vehivle",response)
-      Alert.alert('Success', `Customer Registered!\nEntity ID: ${payload.entityId}`);
+      Alert.alert('Success', `Customer Registered!\nEntity ID: `);
     } catch (error) {
+      console.log("error",error.message)
+    
+
       const errData = error.response?.data;
       const detailMessage = errData?.error?.exception?.detailMessage;
 
@@ -179,6 +235,40 @@ export default function VehicleRegistration({ navigation }) {
     }
   };
 
+ 
+  
+ const fetchSub = async (adminID, setSubData) => {
+
+  try {
+    const { data } = await axios.get(`https://api.aktollpark.com/api/subpartner/Subpartner/${adminID}`);
+    setSubData(data?.data || [])
+  } catch (error) {
+    console.error('Error fetching subpartners:', error);
+  }
+};
+
+useEffect(() => {
+  if (user?.adminID) {
+    fetchSub(user.adminID, setSubData);
+  }
+}, [user?.adminID]);
+const mapperOptions = [
+  { tagClass: "VC4", mapperClass: "MC4" },
+  { tagClass: "VC4", mapperClass: "MC20" },
+  { tagClass: "VC5", mapperClass: "MC5" },
+  { tagClass: "VC5", mapperClass: "MC9" },
+  { tagClass: "VC6", mapperClass: "MC8" },
+  { tagClass: "VC6", mapperClass: "MC11" },
+  { tagClass: "VC7", mapperClass: "MC7" },
+  { tagClass: "VC7", mapperClass: "MC10" },
+  { tagClass: "VC12", mapperClass: "MC12" },
+  { tagClass: "VC12", mapperClass: "MC13" },
+  { tagClass: "VC15", mapperClass: "MC14" },
+  { tagClass: "VC15", mapperClass: "MC15" },
+  { tagClass: "VC16", mapperClass: "MC16" },
+  { tagClass: "VC16", mapperClass: "MC17" },
+];
+  
   return (
     <View style={styles.container}>
       <ScrollView>
@@ -203,12 +293,40 @@ export default function VehicleRegistration({ navigation }) {
           onChangeText={(value) => handleChange('color', value)}
         />
 
-        <Text style={styles.label}>Kit No</Text>
-        <TextInput
-          style={styles.input}
-          value={formData.kitNo}
-          onChangeText={(value) => handleChange('kitNo', value)}
-        />
+<Text style={styles.label}>Tag Class</Text>
+    <Picker
+     selectedValue={tagClass}
+     onValueChange={(value) => setTagClass(value)}
+      style={styles.input}
+    >
+      <Picker.Item label="Select Tag Class" value="" />
+    
+        <Picker.Item  label="VC4" value="VC4" />
+        <Picker.Item  label="VC5" value="VC5" />
+
+        <Picker.Item  label="VC6" value="VC6" />
+
+        <Picker.Item  label="VC7" value="VC7" />
+
+        <Picker.Item  label="VC12" value="VC12" />
+
+        <Picker.Item  label="VC15" value="VC15" />
+
+        <Picker.Item  label="VC16" value="VC16" />
+
+     
+    </Picker>
+<Text style={styles.label}>Kit No</Text>
+    <Picker
+      selectedValue={formData.kitNo}
+      onValueChange={(value) => handleChange('kitNo', value)}
+      style={styles.input}
+    >
+      <Picker.Item label="Select Kit No" value="" />
+      {KitData.map((kit, index) => (
+        <Picker.Item key={index} label={kit.kitNo} value={kit.kitNo} />
+      ))}
+    </Picker>
 
         <Text style={styles.label}>Com Vehicle</Text>
         <TextInput
@@ -287,12 +405,22 @@ export default function VehicleRegistration({ navigation }) {
           onChangeText={(value) => handleDocumentChange('docType', value)}
         />
 
-        <TouchableOpacity style={styles.submitButton} onPress={postRequest}>
+        <TouchableOpacity style={styles.submitButton} onPress={handleModal}>
           <Text style={styles.submitButtonText}>
             {loading ? 'Submitting...' : 'Submit'}
           </Text>
         </TouchableOpacity>
       </ScrollView>
+
+      <FastTagPaymentModal
+  visible={visible}
+  setVisible={setVisible}
+  subData={subData}
+  Balance={Balance}
+  onPaymentSuccess={postRequest} 
+/>
+
+    
     </View>
   );
 }

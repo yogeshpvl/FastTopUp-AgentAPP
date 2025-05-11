@@ -1,36 +1,35 @@
-
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  Image,
   TouchableOpacity,
   ScrollView,
   RefreshControl,
+  Linking,
+  StatusBar,
+  Alert, // Import Alert
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import AntDesign from 'react-native-vector-icons/AntDesign';
 
 import useAuth from '../hooks/useAuth';
 import Bannercoursoul from './Bannercoursoul';
 
-const Home = ({navigation}) => {
-  const {user, token} = useAuth();
+const Home = ({ navigation }) => {
+  const { user, token } = useAuth();
 
+  useEffect(() => {
+    if (!user) {
+      navigation.replace('Login');
+    }
+  }, [user, navigation]);
 
-useEffect(() => {
-  if (!user) {
-    navigation.replace('Login'); // Redirect to Login if user is not authenticated
-  }
-}, [user, navigation]);
-const [refreshing, setRefreshing] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Fetch latest data
   const fetchData = async () => {
     setRefreshing(true);
     try {
-      // Simulate API call or fetch latest user data
       console.log('Refreshing data...');
       await new Promise(resolve => setTimeout(resolve, 1500)); // Simulating delay
     } catch (error) {
@@ -40,24 +39,54 @@ const [refreshing, setRefreshing] = useState(false);
     }
   };
 
+  // Handle BKYC button click
+  const handleBKYC = () => {
+    Alert.alert(
+      'BKYC Options',
+      'Please choose an option:',
+      [
+        {
+          text: 'Status Checker',
+          onPress: () => {
+            // Navigate to Status Checker screen (replace with your actual route)
+            navigation.navigate('BKYCStatusChecker'); // Ensure you have a 'StatusChecker' screen in your navigation stack
+          },
+        },
+        {
+          text: 'Proceed BKYC',
+          onPress: () => {
+            // Redirect to external link
+            Linking.openURL('http://google.com');
+          },
+        },
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
   return (
     <ScrollView
-    style={styles.container}
-        contentContainerStyle={styles.cardContainer}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={fetchData} />
-        }>
+      style={styles.container}
+      contentContainerStyle={styles.scrollContent}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={fetchData} />}
+    >
+      <StatusBar backgroundColor="#8B0000" barStyle="light-content" />
 
-<View style={styles.container}>
       {/* Header Section */}
       <View style={styles.header}>
         <View style={styles.userInfo}>
           <Text style={styles.userName}>{user?.name}</Text>
-          <Text style={styles.userID}>{user?.id.slice(15)}</Text>
+          <Text style={styles.userID}>{user?.id?.slice(15)}</Text>
         </View>
-        <TouchableOpacity style={styles.balanceContainer} onPress={()=>navigation.navigate("wallet")}>
-        <AntDesign name="wallet" size={30} color="#fff" />
-         
+        <TouchableOpacity
+          style={styles.balanceContainer}
+          onPress={() => navigation.navigate('wallet')}
+        >
+          <Icon name="wallet-outline" size={30} color="#fff" />
         </TouchableOpacity>
       </View>
 
@@ -66,43 +95,53 @@ const [refreshing, setRefreshing] = useState(false);
 
       <View>
         <Text
-          style={{fontFamily: 'Poppins-Bold', fontSize: 16, color: 'black', paddingLeft:15,marginTop:10}}>
-          FAST TOPUP EASY AND FAST{' '}
+          style={{
+            fontFamily: 'Poppins-Bold',
+            fontSize: 16,
+            color: 'black',
+            paddingLeft: 15,
+            marginTop: 10,
+          }}
+        >
+          FAST TOPUP EASY AND FAST
         </Text>
       </View>
+
       {/* Card Section */}
-      <ScrollView contentContainerStyle={styles.cardContainer}>
+      <View style={styles.cardContainer}>
         <TouchableOpacity
           style={styles.card}
-          onPress={() => navigation.navigate('TagAssign')}>
+          onPress={() => navigation.navigate('TagAssign')}
+        >
           <Icon name="credit-card-plus-outline" size={30} color="#fff" />
           <Text style={styles.cardText}>TAG ISSUANCE</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.card}
-          onPress={() => navigation.navigate('UploadKyc')}>
-          <Icon name="credit-card-refresh-outline" size={30} color="#fff" />
-          <Text style={styles.cardText}>Upload kyc</Text>
+          onPress={() => navigation.navigate('UploadKyc')}
+        >
+          <Icon name="file-upload-outline" size={30} color="#fff" />
+          <Text style={styles.cardText}>UPLOAD KYC</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.card}
-          onPress={() => navigation.navigate('TagReplacement')}>
-          <Icon name="credit-card-remove-outline" size={30} color="#fff" />
-          <Text style={styles.cardText}>TAG REPLACEMENT</Text>
+          onPress={() => navigation.navigate('netc')}
+        >
+          <Icon name="check-circle-outline" size={30} color="#fff" />
+          <Text style={styles.cardText}>NETC CHECKER</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.card}
-          onPress={() => navigation.navigate('Tags')}>
-          <Icon name="file-document-outline" size={30} color="#fff" />
-          <Text style={styles.cardText}>TAGS</Text>
+          onPress={handleBKYC} // Call the handleBKYC function
+        >
+          <Icon name="bank-outline" size={30} color="#fff" />
+          <Text style={styles.cardText}>BKYC</Text>
         </TouchableOpacity>
-      </ScrollView>
-    </View>
-        </ScrollView>
-
+      </View>
+    </ScrollView>
   );
 };
 
@@ -110,6 +149,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'white',
+  },
+  scrollContent: {
     paddingBottom: 20,
   },
   header: {
@@ -120,13 +161,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-  },
-  headerImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 40,
-    borderWidth: 3,
-    borderColor: '#fff',
   },
   userInfo: {
     flex: 1,
@@ -146,25 +180,14 @@ const styles = StyleSheet.create({
   balanceContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight:10
-  },
-  balanceText: {
-    fontSize: 12,
-    color: '#fff',
-    fontFamily: 'Poppins-Regular',
-  },
-  balanceAmount: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#fff',
-    fontFamily: 'Poppins-Regular',
+    marginRight: 10,
   },
   cardContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
     paddingHorizontal: 5,
-    marginTop: 0,
+    marginTop: 10,
   },
   card: {
     backgroundColor: '#8B0000',
@@ -182,6 +205,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginTop: 8,
     fontFamily: 'Poppins-Regular',
+    textAlign: 'center',
   },
 });
 

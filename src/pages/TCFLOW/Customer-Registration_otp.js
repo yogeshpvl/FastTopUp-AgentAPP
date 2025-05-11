@@ -2,8 +2,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
 import axios from 'axios';
+import useAuth from '../../hooks/useAuth';
 
 const CustomerRegistrationotp = ({navigation}) => {
+   const {user,token} = useAuth();
+   console.log('User:', user);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     entityId: '',
@@ -23,7 +26,7 @@ const CustomerRegistrationotp = ({navigation}) => {
     pincode: '',
     kitNumber: '',
     otp: '',
-    idType: '',
+    idType: 'PAN',
     idNumber: '',
     kycStatus: '',
     eKYCRefNo: '',
@@ -191,7 +194,7 @@ const CustomerRegistrationotp = ({navigation}) => {
       };
      
       const response = await axios.post(
-        `http://192.168.11.102:8500/api/customer/register-with-otp?customerNumber=${contactNo}&agentId=${1212}`,
+        `https://api.aktollpark.com/api/customer/register-with-otp?customerNumber=${contactNo}&agentId=${user?.id}`,
         payload
       );
       
@@ -320,6 +323,7 @@ const CustomerRegistrationotp = ({navigation}) => {
         <Text style={styles.label}>ID Type</Text>
         <TextInput
           style={styles.input}
+          value={formData.idType}
           onChangeText={(value) => handleChange('idType', value)}
         />
 

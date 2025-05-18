@@ -56,7 +56,7 @@ const Home = ({ navigation }) => {
           text: 'Proceed BKYC',
           onPress: () => {
             // Redirect to external link
-            Linking.openURL('http://google.com');
+            Linking.openURL('https://getkyc-fasttag.livquik.com/');
           },
         },
         {
@@ -122,7 +122,7 @@ const Home = ({ navigation }) => {
           onPress={() => navigation.navigate('UploadKyc')}
         >
           <Icon name="file-upload-outline" size={30} color="#fff" />
-          <Text style={styles.cardText}>UPLOAD KYC</Text>
+          <Text style={styles.cardText}>UPLOAD KVV</Text>
         </TouchableOpacity>
 
         <TouchableOpacity

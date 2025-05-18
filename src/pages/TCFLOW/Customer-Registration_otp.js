@@ -35,9 +35,16 @@ const CustomerRegistrationotp = ({navigation}) => {
     documentNumber: '',
     documentExpiryDate: '',
     DOB: '',
-    gender: '',
+    gender: 'M',
   });
 
+useEffect(() => {
+  
+
+      const customerString =  AsyncStorage.getItem('customer');
+
+      console.log("cssis", customerString)
+}, [])
 
 
   useEffect(() => {
@@ -47,7 +54,7 @@ const CustomerRegistrationotp = ({navigation}) => {
       const customerString = await AsyncStorage.getItem('customer');
       const customer = customerString ? JSON.parse(customerString) : null;
   
-   
+   console.log("customerString",customerString)
   
       const parsedPandetails = storedPandetails ? JSON.parse(storedPandetails) : null;
   
@@ -73,6 +80,7 @@ const CustomerRegistrationotp = ({navigation}) => {
           state: '',
           pincode: '',
           contactNo: customer?.contactNo || '',
+           idNumber: customer?.panNumber || '',
         }));
       }
   

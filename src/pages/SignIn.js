@@ -164,7 +164,7 @@ const SignIn = ({ navigation }) => {
 
       {/* Conditionally render the footer based on keyboard visibility */}
       {!isKeyboardVisible && (
-        <Text style={styles.footer}>Powered by: Fast To Up</Text>
+        <Text style={styles.footer}>Powered by SUMUKHA NXT GEN IT SOLUTION</Text>
       )}
     </SafeAreaView>
   );

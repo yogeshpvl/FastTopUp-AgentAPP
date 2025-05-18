@@ -195,13 +195,13 @@ const fetchKitNos = async () => {
     setVisible(true)
   }
 
-  console.log("formData--",formData)
+
   const postRequest = async () => {
     if (!formData.contactNo || !formData.idNumber || !formData.vrn) {
       Alert.alert('Missing Fields', 'Please fill all required fields');
       return;
     }
-console.log("api hitting")
+
     setLoading(true);
 
     try {
@@ -219,6 +219,8 @@ console.log("api hitting")
         `https://api.aktollpark.com/api/customer/vehicle-registration`,
         payload
       );
+      await AsyncStorage.removeItem("customer");
+
       navigation.navigate("UploadKyc")
       console.log("response vehivle",response)
       Alert.alert('Success', `Customer Registered!\nEntity ID: `);
@@ -268,7 +270,11 @@ const mapperOptions = [
   { tagClass: "VC16", mapperClass: "MC16" },
   { tagClass: "VC16", mapperClass: "MC17" },
 ];
-  
+  const [mapperClass, setMapperClass] = useState("");
+
+  const filteredMapperOptions = mapperOptions
+    .filter((item) => item.tagClass === tagClass)
+    .map((item) => item.mapperClass);
   return (
     <View style={styles.container}>
       <ScrollView>
@@ -316,6 +322,18 @@ const mapperOptions = [
 
      
     </Picker>
+    <Text style={styles.label}>Mapper Class</Text>
+      <Picker
+        selectedValue={mapperClass}
+        onValueChange={(value) => setMapperClass(value)}
+        style={styles.input}
+        enabled={tagClass !== ""} // Disable if tagClass not selected
+      >
+        <Picker.Item label="Select Mapper Class" value="" />
+        {filteredMapperOptions.map((mapper) => (
+          <Picker.Item key={mapper} label={mapper} value={mapper} />
+        ))}
+      </Picker>
 <Text style={styles.label}>Kit No</Text>
     <Picker
       selectedValue={formData.kitNo}

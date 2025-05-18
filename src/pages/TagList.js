@@ -18,13 +18,24 @@ import moment from 'moment';
 import useAuth from '../hooks/useAuth';
 import { Production_URL } from '../apiservice/api';
 
-// Color palette for tag classes
+// Color palette for tag classes VC4 to VC16
 const tagClassColors = {
-  VC4: ['#8B0000', '#B22222'],
-  VC12: ['#2E7D32', '#4CAF50'],
-  VC15: ['#1565C0', '#2196F3'],
-  default: ['#616161', '#9E9E9E'],
+  VC4:  ['#8B0000', '#B22222'], // Dark Red to Firebrick
+  VC5:  ['#A52A2A', '#CD5C5C'], // Brown to Indian Red
+  VC6:  ['#FF4500', '#FF7F50'], // OrangeRed to Coral
+  VC7:  ['#FFA500', '#FFB84D'], // Orange to Light Orange
+  VC8:  ['#9C27B0', '#BA68C8'], // Purple to Light Purple
+  VC9:  ['#6A1B9A', '#AB47BC'], // Deep Purple to Medium Orchid
+  VC10: ['#1565C0', '#2196F3'], // Blue shades
+  VC11: ['#283593', '#5C6BC0'], // Indigo shades
+  VC12: ['#2E7D32', '#4CAF50'], // Green shades
+  VC13: ['#388E3C', '#81C784'], // Medium Green to Light Green
+  VC14: ['#00897B', '#4DB6AC'], // Teal to Aqua
+  VC15: ['#006064', '#26C6DA'], // Cyan to Light Blue-Cyan
+  VC16: ['#455A64', '#90A4AE'], // Blue Grey to Light Grey Blue
+  default: ['#616161', '#9E9E9E'] // Default grey tones
 };
+
 
 const TagList = () => {
   const [tags, setTags] = useState([]);

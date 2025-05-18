@@ -43,7 +43,7 @@ const Wallet = ({navigation}) => {
             const orderResponse = await fetch("https://api.aktollpark.com/create-order", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ amount, currency: "INR", agentId: "67ae10d8578a05a658278f91" })
+                body: JSON.stringify({ amount, currency: "INR", agentId: user.id })
             });
             const order = await orderResponse.json();
 
@@ -53,9 +53,9 @@ const Wallet = ({navigation}) => {
                 currency: "INR",
                 key: "rzp_test_1iDoeKTN6YVLnj",
                 amount: order.amount,
-                name: "Your App Name",
+                name: "Fast top up",
                 order_id: order.id,
-                prefill: { email: "test@example.com", contact: "9999999999", name: "Test User" },
+                prefill: { email: user.name, contact: "9999999999", name: user.name },
                 theme: { color: "#8B0000" }
             };
 
@@ -69,7 +69,7 @@ const Wallet = ({navigation}) => {
                                 order_id: order.id,
                                 payment_id: paymentData.razorpay_payment_id,
                                 signature: paymentData.razorpay_signature,
-                                agentId: "67ae10d8578a05a658278f91",
+                                agentId: user.id,
                                 amount
                             })
                         });
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#DDD',
         fontFamily: 'Poppins-Regular',
-        // elevation: 2,
+       color:"black",
         shadowColor: '#B22222',
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.15,

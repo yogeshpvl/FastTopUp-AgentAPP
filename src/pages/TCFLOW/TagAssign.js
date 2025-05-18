@@ -47,10 +47,11 @@ const [loader, setloader]=useState(false)
       );
 
       const data = res.data;
-      console.log('Fetched Info:', data);
+      console.log('Fetched Info:', res.data.customer);
+      await AsyncStorage.setItem("customer", JSON.stringify(res.data.customer));
+
       await AsyncStorage.setItem("address", JSON.stringify(res.data.panAddress?.address));
       await AsyncStorage.setItem("pandetails", JSON.stringify(res.data.panAddress));
-      await AsyncStorage.setItem("customer", JSON.stringify(res.data.customer));
 
 if(data.status === "CUSTOMER REGISTERED"){
   navigation.navigate("vehiclereg");
